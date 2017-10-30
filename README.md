@@ -11,6 +11,8 @@ support for other integrations!
 
 ## Installation
 
+- Install this package `npm install pr-deployment` or `yarn install pr-deployment`
+
 - Includes the [Now CLI](https://github.com/zeit/now-cli) in your project.
 
     `npm install now --save-dev`
