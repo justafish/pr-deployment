@@ -1,6 +1,6 @@
 {
   "name": "pr-deployment",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pull Request deployment to Zeit Now",
   "main": "./dist/index.js",
   "scripts": {
