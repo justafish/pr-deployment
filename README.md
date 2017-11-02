@@ -4,6 +4,8 @@ This package provides functions which allow you to integrate pull request deploy
 workflow. It will stand up a running environment for your code, and then pull it down when no longer
 needed.
 
+It uses the GitHub status API to check the status of deployments attached to PRs.
+
 ![A GitHub comment with a link to a code deployment](https://i.imgur.com/dYS29r9l.png)
 
 Currently it supports GitHub and [Now](https://zeit.co/now) - please open an issue if you'd like
@@ -34,7 +36,7 @@ They will need the repo scope.
 ### Cleanup
 
 The `cleanup` function will remove deployments from Now which aren't attached to any currently open
-pull requests. 
+pull requests via the status API (see the Circle CI example at the bottom for how to do this).
 
 ```node
 #!/usr/bin/env node
@@ -46,6 +48,7 @@ prDeployment.cleanup({
   ghAuthToken: process.env.GH_AUTH_TOKEN,
   repoUsername: 'Your GitHub Username',
   repoName: 'Your Repo Name',
+  contextName: 'pr-deployment/deployment'
 })
   .then(cleanedUpDeployments => {
     cleanedUpDeployments.forEach(deployment => {
@@ -98,16 +101,23 @@ Add the following environment variables to your CircleCI project:
 - `GH_AUTH_TOKEN_USERNAME` - The username for the GitHub user which will post a comment
 - `GH_AUTH_TOKEN` - The authorisation token for the above user
 
-Add the following step to your config.yml:
+Add the following step to your config.yml (and make sure you install `commit-status` to your project):
 
 ```
 - run:
   name: now.sh deploy
   command: |
+          npm run commit-status pending pr-deployment/deployment "Deploy pending" ${CIRCLE_BUILD_URL}
           ./.circleci/deployment-cleanup
           URL=$(./node_modules/.bin/now -t ${NOW_TOKEN} --public)
           echo $URL
+          npm run commit-status success pr-deployment/deployment "Deploy successful" ${URL}
           URL=${URL} ./.circleci/deployment-comment
+
+- run:
+          name: Set GitHub Status to Fail
+          command: npm run commit-status failure pr-deployment/deployment "Unable to deploy" ${CIRCLE_BUILD_URL}
+          when: on_fail
 ```
 
 ![Screenshot of Now deployment in CircleCI](https://i.imgur.com/8KA4S2w.png)

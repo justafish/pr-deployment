@@ -9,7 +9,7 @@ import fetch from 'isomorphic-fetch';
 // Get all active now.sh deployments
 const cleanup = ({
   // eslint-disable-next-line max-len
-  nowToken = null, ghAuthTokenUsername = null, ghAuthToken = null, repoUsername = null, repoName = null,
+  nowToken = null, ghAuthTokenUsername = null, ghAuthToken = null, repoUsername = null, repoName = null, contextName = 'pr-deployment/deployment'
 }) => {
   if (!nowToken || !ghAuthTokenUsername || !ghAuthToken || !repoUsername || !repoName) {
     return Promise.reject(new Error('All required input parameters for cleanup were not provided.'));
@@ -52,8 +52,8 @@ const cleanup = ({
       });
 
       allStatuses = allStatuses
-      // Get only statuses which are for ci/deploy
-        .filter(status => status.context === 'ci/deploy')
+        // Get only statuses which are for ci/deploy
+        .filter(status => status.context === contextName)
         // Retrieve only the deployed URL
         .map(status => status.target_url)
         // Make sure this is a now.sh URL
