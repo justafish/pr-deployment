@@ -16,6 +16,7 @@ const cleanup = ({
   }
 
   let deployments = null;
+  let aliases = [];
   const deploymentNames = {};
   const nowShHeaders = { headers: { Authorization: `Bearer ${nowToken}` } };
   const githubHeaders = {
@@ -29,10 +30,18 @@ const cleanup = ({
   return fetch('https://api.zeit.co/now/deployments', nowShHeaders)
     .then(res => res.json())
     .then((response) => {
-      // Filter out containers which are still being built.
+      aliases = response.aliases.map(alias => alias.deployment.url);
+      return fetch('https://api.zeit.co/now/deployments', nowShHeaders);
+    })
+    .then(res => res.json())
+    .then((response) => {
       deployments = response.deployments
+        // Filter out containers which aren't part of the given repo.
+        .filter(deployment => deployment.name === repoName)
+        // Filter out containers which are still being built.
         .filter(deployment => typeof deployment.url !== 'undefined')
-        .filter(deployment => deployment.name === repoName);
+        // Filter out deployments which are aliased.
+        .filter(deployment => !aliases.includes(deployment.url));
       // Save into a variable by ID so we can use it as a reference later.
       deployments.forEach((deployment) => {
         deploymentNames[deployment.uid] = deployment;

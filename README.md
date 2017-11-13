@@ -36,7 +36,8 @@ They will need the repo scope.
 ### Cleanup
 
 The `cleanup` function will remove deployments from Now which aren't attached to any currently open
-pull requests via the status API (see the Circle CI example at the bottom for how to do this).
+pull requests via the status API (see the Circle CI example at the bottom for how to do this). It
+will also not remove any deployments which have an alias associated.
 
 ```node
 #!/usr/bin/env node
