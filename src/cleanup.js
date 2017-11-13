@@ -27,7 +27,7 @@ const cleanup = ({
     },
   };
 
-  return fetch('https://api.zeit.co/now/deployments', nowShHeaders)
+  return fetch('https://api.zeit.co/now/aliases', nowShHeaders)
     .then(res => res.json())
     .then((response) => {
       aliases = response.aliases.map(alias => alias.deployment.url);
